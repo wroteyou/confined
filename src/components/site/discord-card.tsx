@@ -79,7 +79,6 @@ function SongRow() {
 }
 
 export function DiscordCard({ presence, handle }: { presence: Presence | null; handle: string }) {
-  const { presences } = useNowPlaying();
   if (!presence) {
     return (
       <Spot className="flex items-center gap-4 p-5">
@@ -91,10 +90,7 @@ export function DiscordCard({ presence, handle }: { presence: Presence | null; h
   const u = presence.discord_user, st = presence.discord_status;
   const guild = u.primary_guild?.identity_enabled && u.primary_guild.tag ? u.primary_guild : null;
   const custom = presence.activities.find(a => a.type === 4);
-  // both accounts are me, and lanyard only sees activity on whichever one is active, so merge them
-  const seen = new Set<string>();
-  const acts = [presence, ...presences].flatMap(p => p?.activities ?? [])
-    .filter(a => a.type !== 4 && a.name !== 'Spotify' && !seen.has(a.type + a.name) && seen.add(a.type + a.name));
+  const acts = presence.activities.filter(a => a.type !== 4 && a.name !== 'Spotify');
   const on = (['desktop', 'mobile', 'web'] as const).filter(k => presence[`active_on_discord_${k}`]);
 
   return (
@@ -139,7 +135,7 @@ export function DiscordCard({ presence, handle }: { presence: Presence | null; h
       )}
 
       {acts.map((a, i) => <ActivityRow key={a.name + i} a={a} />)}
-      <SongRow />
+      {st !== 'offline' && <SongRow />}
 
       <div className="flex items-center justify-between font-mono text-xs text-muted-foreground">
         <span className="flex items-center gap-2"><span className="size-2 rounded-full" style={{ background: STATUS_COLOR[st] }} />{STATUS_TEXT[st]}</span>
