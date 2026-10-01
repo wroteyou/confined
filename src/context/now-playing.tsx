@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { DISCORDS } from '@/config';
-import { cleanTitle, cover, fetchLyrics, findVideo, lanyard, lastfm, type Lyrics, type Presence, type Spotify } from '@/lib/api';
+import { cleanTitle, cover, estimateTiming, fetchLyrics, findVideo, lanyard, lastfm, type Lyrics, type Presence, type Spotify } from '@/lib/api';
 import { usePoll } from '@/hooks/use-now';
 import { ytCmd, ytListen } from '@/lib/yt';
 
@@ -9,7 +9,7 @@ export type Song = { name: string; artist: string; url: string; art: string };
 type Ctx = {
   presences: (Presence | null)[];
   song: Song | null;
-  spotify: Spotify | null;   // spotify activity from discord, only when it matches `song`
+  spotify: Spotify | null;   // timing for `song`: live from discord, held over, or estimated from last.fm
   lyrics: Lyrics | null;
   listening: boolean;        // listen along on?
   toggleListen: () => void;
@@ -26,8 +26,17 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const [lyrics, setLyrics] = useState<Lyrics | null>(null);
   const [listening, setListening] = useState(false);
 
+  const [estimate, setEstimate] = useState<Spotify | null>(null);
+  const lastLive = useRef<Spotify | null>(null);
+  const seenAt = useRef<number | null>(null);
+
   const anySpotify = presences.find(p => p?.listening_to_spotify)?.spotify ?? null;
-  const spotify = song && anySpotify && anySpotify.song.toLowerCase().includes(cleanTitle(song.name).toLowerCase()) ? anySpotify : null;
+  const isSong = (sp: Spotify | null): sp is Spotify => !!song && !!sp && sp.song.toLowerCase().includes(cleanTitle(song.name).toLowerCase());
+  const live = isSong(anySpotify) ? anySpotify : null;
+  if (live) lastLive.current = live;
+  // going invisible / switching accounts drops spotify mid song, but the timing doesn't change
+  const held = !live && isSong(lastLive.current) && Date.now() < lastLive.current.timestamps.end ? lastLive.current : null;
+  const spotify = live ?? held ?? estimate;
 
   usePoll(() => { Promise.all(DISCORDS.map(d => lanyard(d.id))).then(setPresences); }, 15000);
 
@@ -42,10 +51,27 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
       let next: Song | null = null;
       if (t?.['@attr']?.nowplaying === 'true') next = { name: t.name, artist: t.artist['#text'], url: t.url, art: cover(t.image) };
       else if (sp) next = { name: sp.song, artist: sp.artist.replace(/;/g, ','), url: 'https://open.spotify.com/track/' + sp.track_id, art: sp.album_art_url };
-      if (next) { misses.current = 0; setSong(s => (s?.name === next!.name && s.artist === next!.artist ? s : next)); }
+      if (next) {
+        misses.current = 0;
+        setSong(s => {
+          if (s?.name === next!.name && s.artist === next!.artist) return s;
+          seenAt.current = s ? Date.now() - 5000 : null; // only a real change counts, not the first load. polls are 10s apart
+          return next;
+        });
+      }
       else if (++misses.current >= 2) setSong(null);
     }).catch(() => {});
-  }, 20000);
+  }, 10000);
+
+  useEffect(() => {
+    setEstimate(null);
+    if (!song) return;
+    let alive = true;
+    estimateTiming(song.name, song.artist, seenAt.current).then(t => alive && t && setEstimate({
+      track_id: '', song: song.name, artist: song.artist, album: '', album_art_url: song.art, timestamps: t, estimated: true,
+    }), () => {});
+    return () => { alive = false; };
+  }, [song?.name, song?.artist]);
 
   useEffect(() => {
     setLyrics(null);

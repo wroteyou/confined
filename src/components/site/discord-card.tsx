@@ -62,7 +62,7 @@ function SongRow() {
           : <div className="grid size-14 shrink-0 place-items-center rounded-lg bg-white/[0.06]"><Headphones className="size-6" /></div>}
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em] text-[rgb(var(--glow))]">
-            <span className="eq"><i /><i /><i /></span>listening to{spotify && ' spotify'}
+            <span className="eq"><i /><i /><i /></span>listening to{spotify && !spotify.estimated && ' spotify'}
           </p>
           <a href={song.url} target="_blank" rel="noopener noreferrer" className="block truncate font-semibold hover:underline">{song.name}</a>
           <p className="truncate text-sm text-muted-foreground">by {song.artist}{spotify?.album && ` · ${spotify.album}`}</p>

@@ -153,7 +153,7 @@ function NowPlaying() {
         className="mx-auto w-fit"
       />
       <div className="min-w-0">
-        <p className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-glow"><span className="eq"><i /><i /><i /></span>now playing{spotify && ' on spotify'}</p>
+        <p className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-glow"><span className="eq"><i /><i /><i /></span>now playing{spotify && !spotify.estimated && ' on spotify'}</p>
         <h2 className="text-4xl leading-tight font-semibold tracking-tight sm:text-5xl">{song.name}</h2>
         <p className="mt-2 text-lg text-muted-foreground">by {song.artist}{spotify?.album && <> · <span className="font-serif italic">{spotify.album}</span></>}</p>
         <LyricLine className="mt-8 min-h-[2.6em] text-2xl leading-snug sm:text-3xl" />

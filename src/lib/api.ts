@@ -8,6 +8,23 @@ export const lastfm = <T = any>(method: string, extra = '') =>
   getJSON<T>(`https://ws.audioscrobbler.com/2.0/?method=${method}&user=${LASTFM_USER}&api_key=${LASTFM_KEY}&format=json${extra}`);
 export const cover = (imgs?: { '#text': string }[]) => imgs?.at(-1)?.['#text'] || '';
 
+const duration = (artist: string, track: string) =>
+  lastfm('track.getinfo', `&artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}`).then(d => +d.track?.duration || 0, () => 0);
+
+// for when discord isn't reporting spotify. last.fm stamps scrobbles with when the track
+// started, so the current one started when the previous one ended
+// `seenAt` is when this tab saw the song change, used if the previous track got skipped
+export async function estimateTiming(name: string, artist: string, seenAt: number | null) {
+  const [cur, prev] = (await lastfm('user.getrecenttracks', '&limit=2')).recenttracks.track;
+  if (cur?.['@attr']?.nowplaying !== 'true' || cur.name !== name) return null;
+  const [prevLen, len] = await Promise.all([prev?.date ? duration(prev.artist['#text'], prev.name) : 0, duration(artist, name)]);
+  if (!len) return null;
+  const ok = (start: number) => Date.now() - start > -5000 && Date.now() - start < len;
+  const start = prev?.date && prevLen ? +prev.date.uts * 1000 + prevLen : NaN;
+  if (ok(start)) return { start, end: start + len };
+  return seenAt && ok(seenAt) ? { start: seenAt, end: seenAt + len } : null;
+}
+
 // lanyard
 export const lanyard = (id: string) =>
   getJSON<{ success: boolean; data: Presence }>(`https://api.lanyard.rest/v1/users/${id}`).then(j => (j.success ? j.data : null)).catch(() => null);
@@ -18,7 +35,7 @@ export type Activity = {
   assets?: { large_image?: string; large_text?: string; small_image?: string; small_text?: string };
   timestamps?: { start?: number; end?: number };
 };
-export type Spotify = { track_id: string; song: string; artist: string; album: string; album_art_url: string; timestamps: { start: number; end: number } };
+export type Spotify = { track_id: string; song: string; artist: string; album: string; album_art_url: string; timestamps: { start: number; end: number }; estimated?: boolean };
 export type Presence = {
   discord_user: {
     id: string; username: string; global_name?: string; avatar?: string;
