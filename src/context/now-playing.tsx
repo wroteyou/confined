@@ -98,7 +98,9 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
           const max = Math.max(px[i], px[i + 1], px[i + 2]), min = Math.min(px[i], px[i + 1], px[i + 2]);
           if (max - min > 40 && max > 70) { r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
         }
-        if (n) root.style.setProperty('--glow', `${(r / n) | 0} ${(g / n) | 0} ${(b / n) | 0}`);
+        if (!n) return;
+        const k = Math.max(1, 200 / Math.max(r / n, g / n, b / n)); // dark covers get brightened so text stays readable
+        root.style.setProperty('--glow', [r, g, b].map(c => Math.min(255, (c / n) * k) | 0).join(' '));
       } catch {} // tainted canvas, keep default
     };
     img.src = song.art;
