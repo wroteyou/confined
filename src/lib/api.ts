@@ -71,6 +71,10 @@ export async function findVideo(q: string): Promise<string | null> {
       id = d.items?.[0]?.id?.videoId ?? null;
     } catch {}
   }
+  // confined.wtf's own lookup: works inside a confined.wtf custom code sandbox, where piped is blocked
+  if (!id) {
+    try { id = (await getJSON<{ id: string | null }>(`https://confined.wtf/api/w/yt?q=${encodeURIComponent(q)}`)).id ?? null; } catch {}
+  }
   for (const api of PIPED) {
     if (id) break;
     try {
