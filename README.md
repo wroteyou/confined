@@ -1,6 +1,6 @@
 # confined
 
-my biolink, live at [confined.wtf](https://confined.wtf)
+my biolink, live at [confined.wtf](https://confined.wtf/x)
 
 - now playing from last.fm / spotify, with the music video in the background
 - synced lyrics (lrclib) and listen along
