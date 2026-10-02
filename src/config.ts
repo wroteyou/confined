@@ -16,7 +16,7 @@ export const MY_TZ = 'America/New_York';
 export const VIEWS_KEY = 'confined.wtf/views'; // abacus.jasoncameron.dev counter
 
 export const NAME = 'convict';
-export const DOMAIN = 'confined.wtf';
+export const DOMAIN = 'confined';
 export const TAGLINE = ['cybersec', 'networking', 'compsci'];
 export const TELEGRAM = 'funddeposit';
 export const GITHUB = 'wroteyou';
