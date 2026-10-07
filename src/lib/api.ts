@@ -59,23 +59,26 @@ export async function hitViews() {
   return value;
 }
 
-// youtube search, cached in localstorage
+// youtube search, cached in localstorage. confined.wtf goes first: it checks the hit is really this song
+// (title, artist channel, length) instead of trusting youtube's first result, which is often a cover or another song
 const PIPED = ['https://api.piped.private.coffee', 'https://pipedapi.kavin.rocks'];
-export async function findVideo(q: string): Promise<string | null> {
-  const key = 'yt:' + q.toLowerCase();
+export async function findVideo(q: string, song?: { artist: string; name: string }): Promise<string | null> {
+  const key = 'yt2:' + q.toLowerCase();
   try { const c = localStorage.getItem(key); if (c) return c; } catch {}
-  let id: string | null = null;
-  if (YT_KEY) {
+  let id: string | null = null, checked = false;
+  try {
+    const url = song ? `track=${encodeURIComponent(song.name)}&artist=${encodeURIComponent(song.artist)}` : `q=${encodeURIComponent(q)}`;
+    id = (await getJSON<{ id: string | null }>(`https://confined.wtf/api/w/yt?${url}`)).id ?? null;
+    checked = true;
+  } catch {}
+  // only when confined.wtf can't be reached: an unchecked hit beats nothing
+  if (!checked && YT_KEY) {
     try {
       const d = await getJSON(`https://www.googleapis.com/youtube/v3/search?part=id&type=video&videoEmbeddable=true&maxResults=1&q=${encodeURIComponent(q)}&key=${YT_KEY}`);
       id = d.items?.[0]?.id?.videoId ?? null;
     } catch {}
   }
-  // confined.wtf's own lookup: works inside a confined.wtf custom code sandbox, where piped is blocked
-  if (!id) {
-    try { id = (await getJSON<{ id: string | null }>(`https://confined.wtf/api/w/yt?q=${encodeURIComponent(q)}`)).id ?? null; } catch {}
-  }
-  for (const api of PIPED) {
+  for (const api of checked ? [] : PIPED) {
     if (id) break;
     try {
       const d = await getJSON(`${api}/search?q=${encodeURIComponent(q)}&filter=videos`, 6000);

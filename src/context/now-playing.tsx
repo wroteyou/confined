@@ -129,7 +129,7 @@ function ListenAlongPlayer({ song, spotify }: { song: Song; spotify: Spotify | n
   useEffect(() => {
     setId(null);
     let alive = true;
-    findVideo(`${song.artist} ${song.name} official audio`).then(v => alive && setId(v));
+    findVideo(`${song.artist} ${song.name} official audio`, song).then(v => alive && setId(v));
     return () => { alive = false; };
   }, [song.name, song.artist]);
 
