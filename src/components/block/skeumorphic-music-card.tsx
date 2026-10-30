@@ -33,7 +33,7 @@ const ControlButton = ({
     <div
       className="rounded-full p-[3px] border-[1px] border-white/5"
       style={{
-        background: 'linear-gradient(135deg, #1c1c21 0%, #0d0d10 100%)',
+        background: 'linear-gradient(135deg, #111 0%, #050505 100%)',
         boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.06), inset -1px -1px 2px rgba(0,0,0,0.6)'
       }}
     >
@@ -69,7 +69,7 @@ const ProgressBar = ({ value }: { value: number | null }) => (
   <div
     style={{
       boxShadow: 'inset 2px 2px 3px rgba(0,0,0,0.6), inset -1px -1px 3px rgba(255,255,255,0.04)',
-      background: 'linear-gradient(135deg, #0c0c0e 0%, #16161a 100%)'
+      background: 'linear-gradient(135deg, #050505 0%, #111 100%)'
     }}
     className="h-2 rounded-full overflow-hidden"
   >

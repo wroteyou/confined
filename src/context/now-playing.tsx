@@ -81,31 +81,6 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
     return () => { alive = false; };
   }, [song?.name, song?.artist]);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (!song?.art) { root.style.removeProperty('--glow'); return; }
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        const c = document.createElement('canvas');
-        c.width = c.height = 16;
-        const ctx = c.getContext('2d')!;
-        ctx.drawImage(img, 0, 0, 16, 16);
-        const px = ctx.getImageData(0, 0, 16, 16).data;
-        let r = 0, g = 0, b = 0, n = 0;
-        for (let i = 0; i < px.length; i += 4) {
-          const max = Math.max(px[i], px[i + 1], px[i + 2]), min = Math.min(px[i], px[i + 1], px[i + 2]);
-          if (max - min > 40 && max > 70) { r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
-        }
-        if (!n) return;
-        const k = Math.max(1, 200 / Math.max(r / n, g / n, b / n)); // dark covers get brightened so text stays readable
-        root.style.setProperty('--glow', [r, g, b].map(c => Math.min(255, (c / n) * k) | 0).join(' '));
-      } catch {} // tainted canvas, keep default
-    };
-    img.src = song.art;
-  }, [song?.art]);
-
   useEffect(() => { if (!song) setListening(false); }, [song]);
   const toggleListen = useCallback(() => setListening(v => !v), []);
 

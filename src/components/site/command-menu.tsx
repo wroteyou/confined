@@ -58,7 +58,7 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
             role="dialog" aria-label="command menu"
             initial={{ opacity: 0, scale: 0.96, y: -8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: -6 }}
             transition={{ type: 'spring', stiffness: 500, damping: 36 }}
-            className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0e]/95 shadow-[0_40px_120px_-20px_rgb(0_0_0),0_0_80px_-30px_rgb(var(--glow)/0.5)]"
+            className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-black/95 shadow-[0_40px_120px_-20px_rgb(0_0_0),0_0_80px_-30px_rgb(var(--glow)/0.5)]"
           >
             <div className="flex items-center gap-3 border-b border-white/[0.07] px-4">
               <Search className="size-4 text-muted-foreground" />

@@ -24,8 +24,8 @@ export function StatusDock() {
   const now = useNow(1000);
   const ping = usePing();
   return (
-    <div className="glass fixed bottom-4 left-1/2 z-40 flex whitespace-nowrap max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1 rounded-full p-1 font-mono text-[11px] text-muted-foreground">
-      <span className="rounded-full bg-[rgb(var(--glow))] px-3 py-1.5 font-medium text-black transition-colors duration-1000">~/convict</span>
+    <div className="glass fixed bottom-4 left-1/2 z-40 flex whitespace-nowrap max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1 !rounded-md p-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="rounded-[4px] bg-white px-3 py-1.5 font-bold text-black">~/convict</span>
       {song && (
         <a href={song.url} target="_blank" rel="noopener noreferrer" className="hidden min-w-0 items-center gap-2 px-3 sm:flex">
           <span className="eq"><i /><i /><i /></span>
@@ -34,7 +34,7 @@ export function StatusDock() {
       )}
       <span className="px-3">local <span className="text-foreground tabular-nums">{clock(MY_TZ, false, now)}</span></span>
       <span className="hidden px-3 md:inline">ping <span className="text-foreground">{ping === null ? '-' : ping + 'ms'}</span></span>
-      <VisitorCount className="bg-transparent px-3 py-1.5 text-[11px]" />
+      <VisitorCount className="bg-transparent px-3 py-1.5 text-[10px]" />
     </div>
   );
 }

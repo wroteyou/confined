@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Gamepad2, Headphones, Square, Play } from 'lucide-react';
 import type { Activity, Presence } from '@/lib/api';
 import { assetUrl, avatarUrl, elapsed, STATUS_COLOR, STATUS_TEXT, VERB } from '@/lib/discord';
@@ -10,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { LyricLine } from '@/components/site/lyric-line';
 import { CopyButton } from '@/components/site/copy-button';
 import { Spot } from '@/components/site/spot';
+import { Modal } from '@/components/ui/modal';
+import { DiscordProfile } from '@/components/site/discord-profile';
 
 function Timer({ start, end }: { start?: number; end?: number }) {
   const now = useNow(1000);
@@ -79,6 +82,7 @@ function SongRow() {
 }
 
 export function DiscordCard({ presence, handle }: { presence: Presence | null; handle: string }) {
+  const [open, setOpen] = useState(false);
   if (!presence) {
     return (
       <Spot className="flex items-center gap-4 p-5">
@@ -92,9 +96,15 @@ export function DiscordCard({ presence, handle }: { presence: Presence | null; h
   const custom = presence.activities.find(a => a.type === 4);
   const acts = presence.activities.filter(a => a.type !== 4 && a.name !== 'Spotify');
   const on = (['desktop', 'mobile', 'web'] as const).filter(k => presence[`active_on_discord_${k}`]);
+  const inner = (e: React.SyntheticEvent) => !!(e.target as HTMLElement).closest('a,button');
 
   return (
-    <Spot className="flex flex-col gap-4 overflow-hidden p-5">
+    <>
+    <Spot
+      role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`open ${u.global_name || u.username}'s discord profile`}
+      onClick={e => !inner(e) && setOpen(true)}
+      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget && (e.preventDefault(), setOpen(true))}
+      className="flex cursor-pointer flex-col gap-4 overflow-hidden p-5 transition-colors hover:border-white/25 focus-visible:outline-2 focus-visible:outline-white/60">
       <div className="flex items-center gap-4">
         <div className="relative shrink-0">
           <Avatar className="size-16">
@@ -142,6 +152,10 @@ export function DiscordCard({ presence, handle }: { presence: Presence | null; h
         <CopyButton text={u.username}>copy @</CopyButton>
       </div>
     </Spot>
+    <Modal open={open} onClose={() => setOpen(false)} label={`${u.global_name || u.username} discord profile`}>
+      <DiscordProfile presence={presence} />
+    </Modal>
+    </>
   );
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { findVideo } from '@/lib/api';
 import { ytCmd, ytListen } from '@/lib/yt';
 import { useNowPlaying } from '@/context/now-playing';
-import { Globe } from '@/components/site/globe';
+import { AsciiField } from '@/components/site/ascii-field';
 
 export function Background() {
   const { song } = useNowPlaying();
@@ -47,13 +47,13 @@ export function Background() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background">
       <div className={`absolute inset-0 transition-opacity duration-[1600ms] ${videoOn ? 'opacity-0' : 'opacity-100'}`}>
-        <Globe className="size-full" />
+        <AsciiField className="size-full" />
       </div>
 
       {song?.art && (
         <div
           key={song.art}
-          className="absolute -inset-20 animate-in fade-in bg-cover bg-center opacity-25 blur-[90px] saturate-150 duration-[1500ms]"
+          className="absolute -inset-20 animate-in fade-in bg-cover bg-center opacity-[0.12] blur-[90px] grayscale duration-[1500ms]"
           style={{ backgroundImage: `url("${song.art}")` }}
         />
       )}
@@ -70,13 +70,13 @@ export function Background() {
             allow="autoplay; encrypted-media"
             onLoad={() => ytListen(frame.current, 1)}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/80 via-[#050505]/70 to-[#050505]/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
           {/* hides letterbox bars */}
-          <div className="absolute inset-0 bg-[linear-gradient(#050505_0%,#050505_12%,transparent_28%,transparent_72%,#050505_88%,#050505_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(#000_0%,#000_12%,transparent_28%,transparent_72%,#000_88%,#000_100%)]" />
         </div>
       )}
 
-      <div className="absolute inset-0 bg-[radial-gradient(700px_420px_at_85%_-10%,rgb(var(--glow)/0.16),transparent_70%)] transition-[background] duration-1000" />
+      <div className="absolute inset-0 bg-[radial-gradient(700px_420px_at_85%_-10%,rgb(var(--glow)/0.07),transparent_70%)] transition-[background] duration-1000" />
       <div className="absolute inset-0 bg-[radial-gradient(transparent_45%,rgba(0,0,0,0.55)_85%,rgba(0,0,0,0.85)_100%)]" />
     </div>
   );

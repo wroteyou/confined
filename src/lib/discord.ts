@@ -22,3 +22,10 @@ export const elapsed = (ms: number) => {
 };
 
 export const icon = (s: string) => (s.startsWith('http') ? s : `https://cdn.jsdelivr.net/npm/simple-icons@13/icons/${s}.svg`);
+
+// public_flags bits -> label, used when the profile lookup is unavailable
+export const FLAG_LABELS: [number, string][] = [
+  [1, 'Discord Staff'], [2, 'Partnered Server Owner'], [4, 'HypeSquad Events'], [8, 'Bug Hunter'],
+  [64, 'HypeSquad Bravery'], [128, 'HypeSquad Brilliance'], [256, 'HypeSquad Balance'], [512, 'Early Supporter'],
+  [16384, 'Bug Hunter Level 2'], [131072, 'Early Verified Bot Developer'], [262144, 'Moderator Programs Alumni'], [4194304, 'Active Developer'],
+];

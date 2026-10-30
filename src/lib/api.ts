@@ -38,7 +38,7 @@ export type Activity = {
 export type Spotify = { track_id: string; song: string; artist: string; album: string; album_art_url: string; timestamps: { start: number; end: number }; estimated?: boolean };
 export type Presence = {
   discord_user: {
-    id: string; username: string; global_name?: string; avatar?: string;
+    id: string; username: string; global_name?: string; avatar?: string; public_flags?: number;
     avatar_decoration_data?: { asset: string } | null;
     primary_guild?: { tag?: string; badge?: string; identity_guild_id?: string; identity_enabled?: boolean } | null;
   };
@@ -107,3 +107,21 @@ export async function fetchLyrics(track: string, artist: string): Promise<Lyrics
     : null;
   return { lines, instrumental: !!d.instrumental };
 }
+
+// discord profile (bio, badges, connections), lanyard doesn't carry these. cached so reopening is free
+export type DstnProfile = {
+  user?: { bio?: string; banner?: string | null; accent_color?: number | null };
+  user_profile?: { bio?: string; pronouns?: string; banner?: string | null; accent_color?: number | null };
+  badges: { id: string; description: string; icon: string; link?: string }[];
+  connected_accounts?: { type: string; id: string; name: string }[];
+};
+const profiles = new Map<string, Promise<DstnProfile | null>>();
+export const dstnProfile = (id: string) => {
+  let p = profiles.get(id);
+  if (!p) {
+    p = getJSON<DstnProfile>(`https://dcdn.dstn.to/profile/${id}`).then(j => (Array.isArray(j.badges) ? j : null)).catch(() => null);
+    profiles.set(id, p);
+    p.then(r => r || profiles.delete(id)); // don't cache failures
+  }
+  return p;
+};

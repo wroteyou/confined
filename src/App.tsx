@@ -46,6 +46,7 @@ export default function App() {
   return (
     <>
       <Background />
+      <div className="scanlines" aria-hidden />
       <Cursor />
       <ClickSpark sparkColor="#ffffff" sparkRadius={22} sparkCount={10} />
 
@@ -53,13 +54,12 @@ export default function App() {
         items={NAV}
         active={page}
         logo={
-          <span className="flex items-center gap-2.5 font-mono text-[13px] text-muted-foreground">
-            <span className="size-2.5 rounded-[3px] bg-glow transition-colors duration-1000" />
-            <b className="font-medium text-foreground">{NAME}</b>@{DOMAIN}
+          <span className="font-mono text-[14px] font-bold text-foreground">
+            {NAME}<span className="blink">_</span>
           </span>
         }
         right={
-          <button onClick={() => setMenu(true)} className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] py-1 pr-1 pl-3 text-xs text-muted-foreground transition hover:text-foreground">
+          <button onClick={() => setMenu(true)} className="flex items-center gap-2 rounded-full border border-white/[0.14] bg-transparent py-1 pr-1 pl-3 text-xs text-muted-foreground transition hover:text-foreground">
             <Search className="size-3.5" />menu<Kbd>{MOD} K</Kbd>
           </button>
         }
