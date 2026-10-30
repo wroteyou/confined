@@ -23,20 +23,9 @@ export const Navbar1 = ({
   );
   return (
     <motion.div
-      animate={
-        isDown
-          ? {
-              scaleX: 0.99,
-              boxShadow: `0 10px 40px -10px rgba(0, 0, 0, 0.7)`,
-              y: 10,
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "16px",
-              backgroundColor: "rgba(10, 10, 12, 0.72)",
-            }
-          : { scaleX: 1, y: 0, border: "1px solid rgba(255,255,255,0)", borderRadius: "16px", backgroundColor: "rgba(10, 10, 12, 0)" }
-      }
-      transition={{ duration: 0.2, ease: "easeIn" }}
-      className="fixed top-3 inset-x-3 sm:inset-x-[6vw] xl:inset-x-[14vw] z-50 flex h-14 items-center justify-between gap-3 px-3 backdrop-blur-lg sm:px-5"
+      animate={{ y: isDown ? 8 : 0 }}
+      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      className="glass fixed top-3 inset-x-3 mx-auto max-w-5xl rounded-full z-50 flex h-14 items-center justify-between gap-3 px-3 sm:px-5"
     >
       <a href="#home" aria-label="home" className="hidden shrink-0 sm:block">{logo}</a>
 
